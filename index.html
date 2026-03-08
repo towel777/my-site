@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Никита Бургун — Middle+ Frontend Developer</title>
+  <meta name="description" content="Middle+ Frontend Developer. Vue.js, TypeScript, Nuxt.js. 4+ лет коммерческого опыта.">
+
+  <link rel="shortcut icon" type="image/x-icon" href="./favicon.ico">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==================== RESET & VARIABLES ==================== */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0a0a0c;
+      --bg-elevated: #111114;
+      --bg-card: #16161a;
+      --bg-card-hover: #1c1c21;
+      --surface: #222228;
+      --border: #2a2a32;
+      --border-hover: #3a3a44;
+      --text: #e8e6e3;
+      --text-secondary: #8a8a96;
+      --text-muted: #55555f;
+      --accent: #c8f031;
+      --accent-dim: #9ab825;
+      --accent-glow: rgba(200, 240, 49, 0.12);
+      --blue: #5b8def;
+      --cyan: #4ecdc4;
+      --serif: 'Instrument Serif', Georgia, serif;
+      --sans: 'DM Sans', system-ui, sans-serif;
+      --mono: 'JetBrains Mono', monospace;
+      --ease: cubic-bezier(0.22, 1, 0.36, 1);
+    }
+
+    html {
+      scroll-behavior: smooth;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+    }
+
+    body {
+      font-family: var(--sans);
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+
+    ::selection {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    a { color: inherit; text-decoration: none; }
+    img { max-width: 100%; display: block; }
+
+    /* ==================== SCROLLBAR ==================== */
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--bg); }
+    ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--text-muted); }
+
+    /* ==================== NOISE OVERLAY ==================== */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 9999;
+    }
+
+    /* ==================== LAYOUT ==================== */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 clamp(20px, 5vw, 48px);
+    }
+
+    /* ==================== ANIMATIONS ==================== */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+
+    @keyframes slideInLeft {
+      from { opacity: 0; transform: translateX(-40px); }
+      to { opacity: 1; transform: translateX(0); }
+    }
+
+    @keyframes lineGrow {
+      from { transform: scaleX(0); }
+      to { transform: scaleX(1); }
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+    }
+
+    .reveal {
+      opacity: 0;
+      transform: translateY(30px);
+      transition: opacity 0.8s var(--ease), transform 0.8s var(--ease);
+    }
+
+    .reveal.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ==================== NAV ==================== */
+    .nav {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
+      padding: 20px 0;
+      transition: all 0.4s var(--ease);
+      backdrop-filter: blur(0px);
+    }
+
+    .nav.scrolled {
+      padding: 12px 0;
+      background: rgba(10, 10, 12, 0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .nav__logo {
+      font-family: var(--serif);
+      font-size: 1.4rem;
+      font-style: italic;
+      letter-spacing: -0.02em;
+      animation: fadeIn 0.8s var(--ease) both;
+    }
+
+    .nav__logo span {
+      color: var(--accent);
+    }
+
+    .nav__links {
+      display: flex;
+      gap: 32px;
+      list-style: none;
+      animation: fadeIn 0.8s var(--ease) 0.1s both;
+    }
+
+    .nav__links a {
+      font-size: 0.85rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      transition: color 0.3s ease;
+      position: relative;
+    }
+
+    .nav__links a::after {
+      content: '';
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: var(--accent);
+      transform: scaleX(0);
+      transform-origin: right;
+      transition: transform 0.3s var(--ease);
+    }
+
+    .nav__links a:hover {
+      color: var(--text);
+    }
+
+    .nav__links a:hover::after {
+      transform: scaleX(1);
+      transform-origin: left;
+    }
+
+    /* ==================== HERO ==================== */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      padding: 120px 0 80px;
+      position: relative;
+    }
+
+    .hero__badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 6px 16px;
+      border: 1px solid var(--border);
+      border-radius: 100px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      letter-spacing: 0.03em;
+      margin-bottom: 32px;
+      width: fit-content;
+      animation: fadeUp 0.8s var(--ease) 0.2s both;
+    }
+
+    .hero__badge-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background: var(--accent);
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    .hero__title {
+      font-family: var(--serif);
+      font-size: clamp(3rem, 8vw, 7rem);
+      font-weight: 400;
+      line-height: 1.0;
+      letter-spacing: -0.03em;
+      margin-bottom: 32px;
+      animation: fadeUp 0.8s var(--ease) 0.35s both;
+    }
+
+    .hero__title em {
+      font-style: italic;
+      color: var(--accent);
+      position: relative;
+    }
+
+    .hero__title em::after {
+      content: '';
+      position: absolute;
+      bottom: 0.08em;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--accent);
+      opacity: 0.3;
+    }
+
+    .hero__subtitle {
+      font-size: clamp(1rem, 2vw, 1.25rem);
+      color: var(--text-secondary);
+      max-width: 620px;
+      line-height: 1.7;
+      margin-bottom: 48px;
+      animation: fadeUp 0.8s var(--ease) 0.5s both;
+    }
+
+    .hero__actions {
+      display: flex;
+      gap: 16px;
+      flex-wrap: wrap;
+      animation: fadeUp 0.8s var(--ease) 0.65s both;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 14px 28px;
+      border-radius: 8px;
+      font-size: 0.9rem;
+      font-weight: 600;
+      letter-spacing: 0.01em;
+      transition: all 0.3s var(--ease);
+      cursor: pointer;
+      border: none;
+    }
+
+    .btn--primary {
+      background: var(--accent);
+      color: var(--bg);
+    }
+
+    .btn--primary:hover {
+      background: #d4f545;
+      transform: translateY(-2px);
+      box-shadow: 0 8px 30px rgba(200, 240, 49, 0.2);
+    }
+
+    .btn--outline {
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn--outline:hover {
+      border-color: var(--text-muted);
+      background: var(--bg-elevated);
+      transform: translateY(-2px);
+    }
+
+    .hero__scroll-indicator {
+      position: absolute;
+      bottom: 40px;
+      left: 50%;
+      transform: translateX(-50%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 8px;
+      color: var(--text-muted);
+      font-size: 0.72rem;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      animation: fadeIn 1s var(--ease) 1.2s both;
+    }
+
+    .hero__scroll-line {
+      width: 1px;
+      height: 40px;
+      background: linear-gradient(to bottom, var(--text-muted), transparent);
+      animation: float 2s ease-in-out infinite;
+    }
+
+    /* ==================== SECTION COMMON ==================== */
+    .section {
+      padding: 100px 0;
+    }
+
+    .section__header {
+      margin-bottom: 64px;
+    }
+
+    .section__label {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .section__label::before {
+      content: '';
+      display: block;
+      width: 24px;
+      height: 1px;
+      background: var(--accent);
+    }
+
+    .section__title {
+      font-family: var(--serif);
+      font-size: clamp(2rem, 4vw, 3.2rem);
+      font-weight: 400;
+      line-height: 1.15;
+      letter-spacing: -0.02em;
+    }
+
+    .divider {
+      height: 1px;
+      background: linear-gradient(to right, transparent, var(--border), transparent);
+    }
+
+    /* ==================== ABOUT ==================== */
+    .about__grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 64px;
+      align-items: start;
+    }
+
+    .about__text p {
+      font-size: 1.05rem;
+      color: var(--text-secondary);
+      line-height: 1.8;
+      margin-bottom: 20px;
+    }
+
+    .about__text strong {
+      color: var(--text);
+      font-weight: 600;
+    }
+
+    .about__metrics {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    .metric {
+      padding: 28px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      transition: all 0.3s var(--ease);
+    }
+
+    .metric:hover {
+      border-color: var(--accent);
+      background: var(--bg-card-hover);
+      transform: translateY(-4px);
+      box-shadow: 0 12px 40px rgba(200, 240, 49, 0.06);
+    }
+
+    .metric__value {
+      font-family: var(--serif);
+      font-size: 2.8rem;
+      font-weight: 400;
+      color: var(--accent);
+      line-height: 1;
+      margin-bottom: 8px;
+    }
+
+    .metric__label {
+      font-size: 0.82rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      letter-spacing: 0.02em;
+    }
+
+    /* ==================== SKILLS ==================== */
+    .skills__grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 20px;
+    }
+
+    .skill-group {
+      padding: 28px 32px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      transition: all 0.3s var(--ease);
+    }
+
+    .skill-group:hover {
+      border-color: var(--border-hover);
+      background: var(--bg-card-hover);
+    }
+
+    .skill-group__title {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      font-weight: 500;
+      color: var(--accent);
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 16px;
+    }
+
+    .skill-group__tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .skill-tag {
+      padding: 6px 14px;
+      background: var(--surface);
+      border: 1px solid transparent;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: all 0.25s ease;
+    }
+
+    .skill-tag:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      background: var(--accent-glow);
+    }
+
+    .skill-tag--primary {
+      color: var(--accent);
+      border-color: rgba(200, 240, 49, 0.2);
+      background: rgba(200, 240, 49, 0.06);
+    }
+
+    /* ==================== EXPERIENCE ==================== */
+    .timeline {
+      position: relative;
+      padding-left: 40px;
+    }
+
+    .timeline::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 12px;
+      bottom: 12px;
+      width: 1px;
+      background: linear-gradient(to bottom, var(--accent), var(--border) 30%, var(--border) 70%, transparent);
+    }
+
+    .timeline__item {
+      position: relative;
+      padding-bottom: 56px;
+    }
+
+    .timeline__item:last-child {
+      padding-bottom: 0;
+    }
+
+    .timeline__dot {
+      position: absolute;
+      left: -44px;
+      top: 8px;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--accent);
+      box-shadow: 0 0 0 4px var(--bg), 0 0 0 5px var(--border);
+    }
+
+    .timeline__item:first-child .timeline__dot {
+      box-shadow: 0 0 0 4px var(--bg), 0 0 0 5px var(--accent), 0 0 20px var(--accent-glow);
+    }
+
+    .timeline__period {
+      font-family: var(--mono);
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      letter-spacing: 0.06em;
+      margin-bottom: 6px;
+    }
+
+    .timeline__company {
+      font-family: var(--serif);
+      font-size: 1.6rem;
+      font-weight: 400;
+      margin-bottom: 4px;
+    }
+
+    .timeline__role {
+      font-size: 0.95rem;
+      color: var(--accent-dim);
+      font-weight: 500;
+      margin-bottom: 12px;
+    }
+
+    .timeline__stack {
+      font-family: var(--mono);
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      margin-bottom: 16px;
+      line-height: 1.8;
+    }
+
+    .timeline__achievements {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .timeline__achievements li {
+      font-size: 0.9rem;
+      color: var(--text-secondary);
+      line-height: 1.6;
+      padding-left: 20px;
+      position: relative;
+    }
+
+    .timeline__achievements li::before {
+      content: '▸';
+      position: absolute;
+      left: 0;
+      color: var(--accent);
+      font-size: 0.8rem;
+    }
+
+    /* ==================== PROJECTS ==================== */
+    .projects__grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+    }
+
+    .project-card {
+      padding: 36px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      transition: all 0.4s var(--ease);
+      position: relative;
+      overflow: hidden;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .project-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--accent), var(--cyan));
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform 0.5s var(--ease);
+    }
+
+    .project-card:hover {
+      border-color: var(--border-hover);
+      background: var(--bg-card-hover);
+      transform: translateY(-6px);
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    }
+
+    .project-card:hover::before {
+      transform: scaleX(1);
+    }
+
+    .project-card__header {
+      display: flex;
+      align-items: flex-start;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+
+    .project-card__icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: var(--accent-glow);
+      border: 1px solid rgba(200, 240, 49, 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+    }
+
+    .project-card__arrow {
+      font-size: 1.2rem;
+      color: var(--text-muted);
+      transition: all 0.3s var(--ease);
+    }
+
+    .project-card:hover .project-card__arrow {
+      color: var(--accent);
+      transform: translate(4px, -4px);
+    }
+
+    .project-card__name {
+      font-family: var(--serif);
+      font-size: 1.4rem;
+      margin-bottom: 10px;
+    }
+
+    .project-card__desc {
+      font-size: 0.88rem;
+      color: var(--text-secondary);
+      line-height: 1.65;
+      margin-bottom: 20px;
+      flex: 1;
+    }
+
+    .project-card__tech {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .project-card__tech span {
+      padding: 4px 10px;
+      background: var(--surface);
+      border-radius: 4px;
+      font-family: var(--mono);
+      font-size: 0.68rem;
+      color: var(--text-muted);
+      font-weight: 500;
+    }
+
+    /* ==================== CONTACT ==================== */
+    .contact {
+      padding: 120px 0;
+      text-align: center;
+    }
+
+    .contact__title {
+      font-family: var(--serif);
+      font-size: clamp(2.5rem, 6vw, 4.5rem);
+      font-weight: 400;
+      line-height: 1.1;
+      letter-spacing: -0.03em;
+      margin-bottom: 24px;
+    }
+
+    .contact__title em {
+      font-style: italic;
+      color: var(--accent);
+    }
+
+    .contact__subtitle {
+      font-size: 1.1rem;
+      color: var(--text-secondary);
+      max-width: 480px;
+      margin: 0 auto 48px;
+      line-height: 1.7;
+    }
+
+    .contact__links {
+      display: flex;
+      justify-content: center;
+      gap: 16px;
+      flex-wrap: wrap;
+    }
+
+    .contact-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      padding: 14px 24px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      font-size: 0.88rem;
+      font-weight: 500;
+      color: var(--text-secondary);
+      transition: all 0.3s var(--ease);
+    }
+
+    .contact-link:hover {
+      border-color: var(--accent);
+      color: var(--text);
+      background: var(--accent-glow);
+      transform: translateY(-3px);
+    }
+
+    .contact-link__icon {
+      font-size: 1.1rem;
+    }
+
+    /* ==================== FOOTER ==================== */
+    .footer {
+      padding: 32px 0;
+      border-top: 1px solid var(--border);
+    }
+
+    .footer .container {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .footer__copy {
+      font-size: 0.78rem;
+      color: var(--text-muted);
+    }
+
+    .footer__built {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      font-family: var(--mono);
+    }
+
+    .footer__built span {
+      color: var(--accent);
+    }
+
+    /* ==================== RESPONSIVE ==================== */
+    @media (max-width: 900px) {
+      .about__grid {
+        grid-template-columns: 1fr;
+        gap: 40px;
+      }
+
+      .projects__grid {
+        grid-template-columns: 1fr;
+      }
+
+      .nav__links {
+        display: none;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .about__metrics {
+        grid-template-columns: 1fr;
+      }
+
+      .hero__scroll-indicator {
+        display: none;
+      }
+
+      .footer .container {
+        flex-direction: column;
+        gap: 8px;
+        text-align: center;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- NAV -->
+  <nav class="nav" id="nav">
+    <div class="container">
+      <a href="#" class="nav__logo">dev<span>.</span></a>
+      <ul class="nav__links">
+        <li><a href="#about">Обо мне</a></li>
+        <li><a href="#skills">Навыки</a></li>
+        <li><a href="#experience">Опыт</a></li>
+        <li><a href="#projects">Проекты</a></li>
+        <li><a href="#contact">Контакты</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container">
+      <div class="hero__badge">
+        <span class="hero__badge-dot"></span>
+        Открыт к предложениям
+      </div>
+
+      <h1 class="hero__title">
+        Middle+ Frontend<br>
+        <em>Developer</em>
+      </h1>
+
+      <p class="hero__subtitle">
+        Создаю быстрые, масштабируемые и&nbsp;красивые веб&#8209;приложения
+        на&nbsp;Vue.js и&nbsp;TypeScript. 4+ лет превращаю сложные бизнес-задачи
+        в&nbsp;элегантные интерфейсы.
+      </p>
+
+      <div class="hero__actions">
+        <a href="#contact" class="btn btn--primary">
+          Связаться со мной ↗
+        </a>
+        <a href="#projects" class="btn btn--outline">
+          Смотреть проекты
+        </a>
+      </div>
+
+      <div class="hero__scroll-indicator">
+        <div class="hero__scroll-line"></div>
+        scroll
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- ABOUT -->
+  <section class="section" id="about">
+    <div class="container">
+      <div class="section__header reveal">
+        <div class="section__label">01 — Обо мне</div>
+        <h2 class="section__title">Архитектор пользовательских<br>интерфейсов</h2>
+      </div>
+
+      <div class="about__grid">
+        <div class="about__text reveal">
+          <p>
+            Middle+ Frontend Engineer с <strong>4+ годами коммерческого опыта</strong>
+            построения клиентских приложений для высоконагруженных B2C/B2B-продуктов.
+          </p>
+          <p>
+            Специализируюсь на экосистеме <strong>Vue.js</strong>: проектирование архитектуры
+            SPA/SSR-приложений, разработка UI&#8209;Kit библиотек, внедрение
+            <strong>Feature-Sliced Design</strong> и оптимизация производительности.
+          </p>
+          <p>
+            Провёл миграцию enterprise-приложения с Vue&nbsp;2 на Vue&nbsp;3 —
+            <strong>150+ компонентов за 4 месяца</strong> без downtime.
+            Инициировал мониторинг Web Vitals, улучшив <strong>LCP на 45%</strong>.
+          </p>
+        </div>
+
+        <div class="about__metrics reveal">
+          <div class="metric">
+            <div class="metric__value">4+</div>
+            <div class="metric__label">Лет коммерческого опыта</div>
+          </div>
+          <div class="metric">
+            <div class="metric__value">150+</div>
+            <div class="metric__label">Компонентов мигрировано</div>
+          </div>
+          <div class="metric">
+            <div class="metric__value">45%</div>
+            <div class="metric__label">Улучшение LCP</div>
+          </div>
+          <div class="metric">
+            <div class="metric__value">94%</div>
+            <div class="metric__label">Покрытие тестами UI-Kit</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- SKILLS -->
+  <section class="section" id="skills">
+    <div class="container">
+      <div class="section__header reveal">
+        <div class="section__label">02 — Стек</div>
+        <h2 class="section__title">Технологии, с которыми<br>работаю каждый день</h2>
+      </div>
+
+      <div class="skills__grid">
+        <div class="skill-group reveal">
+          <div class="skill-group__title">Frontend Core</div>
+          <div class="skill-group__tags">
+            <span class="skill-tag skill-tag--primary">Vue.js 3</span>
+            <span class="skill-tag skill-tag--primary">TypeScript</span>
+            <span class="skill-tag">Composition API</span>
+            <span class="skill-tag">JavaScript ES6+</span>
+            <span class="skill-tag">HTML5</span>
+            <span class="skill-tag">CSS3</span>
+          </div>
+        </div>
+
+        <div class="skill-group reveal">
+          <div class="skill-group__title">Vue Ecosystem</div>
+          <div class="skill-group__tags">
+            <span class="skill-tag skill-tag--primary">Nuxt.js 3</span>
+            <span class="skill-tag skill-tag--primary">Pinia</span>
+            <span class="skill-tag">Vue Router</span>
+            <span class="skill-tag">VueUse</span>
+            <span class="skill-tag">Vuex</span>
+            <span class="skill-tag">SSR / ISR</span>
+          </div>
+        </div>
+
+        <div class="skill-group reveal">
+          <div class="skill-group__title">Architecture</div>
+          <div class="skill-group__tags">
+            <span class="skill-tag skill-tag--primary">Feature-Sliced Design</span>
+            <span class="skill-tag">SOLID</span>
+          </div>
+        </div>
+
+        <div class="skill-group reveal">
+          <div class="skill-group__title">Build & DevOps</div>
+          <div class="skill-group__tags">
+            <span class="skill-tag skill-tag--primary">Vite</span>
+            <span class="skill-tag">Webpack</span>
+            <span class="skill-tag">Docker</span>
+            <span class="skill-tag">CI/CD</span>
+            <span class="skill-tag">GitHub Actions</span>
+          </div>
+        </div>
+
+        <div class="skill-group reveal">
+          <div class="skill-group__title">Testing</div>
+          <div class="skill-group__tags">
+            <span class="skill-tag skill-tag--primary">Vitest</span>
+            <span class="skill-tag">Jest</span>
+            <span class="skill-tag">Cypress</span>
+            <span class="skill-tag">Stryker</span>
+            <span class="skill-tag">Vue Test Utils</span>
+          </div>
+        </div>
+
+        <div class="skill-group reveal">
+          <div class="skill-group__title">UI & Styling</div>
+          <div class="skill-group__tags">
+            <span class="skill-tag skill-tag--primary">SCSS</span>
+            <span class="skill-tag skill-tag--primary">Storybook</span>
+            <span class="skill-tag">Tailwind CSS</span>
+            <span class="skill-tag">BEM</span>
+            <span class="skill-tag">Design Tokens</span>
+            <span class="skill-tag">Figma</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- EXPERIENCE -->
+  <section class="section" id="experience">
+    <div class="container">
+      <div class="section__header reveal">
+        <div class="section__label">03 — Опыт</div>
+        <h2 class="section__title">Карьерный путь</h2>
+      </div>
+
+      <div class="timeline">
+        <!-- Job 1 -->
+        <div class="timeline__item reveal">
+          <div class="timeline__dot"></div>
+          <div class="timeline__period">Декабрь 2022 — Декабрь 2025</div>
+          <h3 class="timeline__company">Mechta.kz</h3>
+          <div class="timeline__role"> Middle+ Frontend Developer</div>
+          <div class="timeline__stack">Vue 3 · TypeScript · Nuxt 3 · Pinia · Vite · Vitest · Storybook · Docker · FSD</div>
+          <ul class="timeline__achievements">
+            <li>Провел полный рефакторинг, устранив legacy-код и архитектурные недочеты. Это ускорило внедрение новой платежной функциональности на 40% и подготовило платформу к предстоящему редизайну без нарушения существующих процессов.</li>
+            <li>Создал и внедрил библиотеку Vue-компонентов, унифицировав UI/UX across projects. Это снизило время разработки новых функций на 30% за счет исключения дублирования кода и ускорения прототипирования.</li>
+            <li>Перестроил архитектуру проекта согласно FSD что упростило масштабирование и ускорило онбординг новых разработчиков.</li>
+            <li>Целенаправленно оптимизировал метрики INP( Interaction to Next Paint) и CLS (Cumulative Layout Shift), что повысило общий балл производительности в Core Web Vitals на 25% и улучшило пользовательский опыт.</li>
+          </ul>
+        </div>
+
+        <div class="timeline__item reveal">
+          <div class="timeline__dot"></div>
+          <div class="timeline__period">Июнь 2021 — Сентябрь 2022</div>
+          <h3 class="timeline__company">SimbirSoft</h3>
+          <div class="timeline__role">Junior → Middle Frontend Developer</div>
+          <div class="timeline__stack">Vue 2/3 · TypeScript · Vuex · Webpack · Jest · SCSS · REST API</div>
+          <ul class="timeline__achievements">
+            <li>Участвовал в сложной и поэтапной миграции ключевых разделов платформы с легаси Vue 2 (Options API) на Vue 3 (Composition API) без остановки продуктовой разработки</li>
+            <li>Разработал модуль управления дашбордами с кастомным drag & drop (без сторонних библиотек) и виртуальным скроллом для таблиц с 10K+ записей</li>
+            <li>Покрыл критическую бизнес-логику unit-тестами на Jest</li>
+            <li>Реализовал оптимистичные обновления для Kanban-доски (Vuex), снизив визуальную задержку операций с 800мс до мгновенного отклика</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- PROJECTS -->
+  <section class="section" id="projects">
+    <div class="container">
+      <div class="section__header reveal">
+        <div class="section__label">04 — Проекты</div>
+        <h2 class="section__title">Open Source &<br>Pet-проекты</h2>
+      </div>
+
+      <div class="projects__grid">
+        <a href="https://nuxt3-ecommerce-admin-woad.vercel.app/login" target="_blank" class="project-card reveal">
+          <div class="project-card__header">
+            <div class="project-card__icon">🛒</div>
+            <span class="project-card__arrow">↗</span>
+          </div>
+          <h3 class="project-card__name">nuxt3-ecommerce-admin</h3>
+          <p class="project-card__desc">
+            Единая панели управления (Dashboard) для менеджеров интернет-магазина: управление каталогом товаров, обработка заказов, аналитика продаж и управление правами доступа сотрудников.
+          </p>
+          <div class="project-card__tech">
+            <span>Nuxt 3</span>
+            <span>TypeScript</span>
+            <span>Pinia</span>
+            <span>FSD</span>
+            <span>Lighthouse</span>
+          </div>
+        </a>
+        <a href="https://nuxt3-maison-store.vercel.app/" target="_blank" class="project-card reveal">
+          <div class="project-card__header">
+            <div class="project-card__icon">🛒</div>
+            <span class="project-card__arrow">↗</span>
+          </div>
+          <h3 class="project-card__name">nuxt3-maison-store</h3>
+          <p class="project-card__desc">
+            Клиентская витрина интернет-магазина (Storefront) с фокусом на высокую производительность (SSR/ISR) для SEO-оптимизации и бесшовный пользовательский опыт (UX).
+          </p>
+          <div class="project-card__tech">
+            <span>Vue 3</span>
+            <span>Pinia</span>
+            <span>Nuxt 3</span>
+            <span>TypeScript</span>
+            <span>FSD</span>
+          </div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"></div>
+
+  <!-- CONTACT -->
+  <section class="contact" id="contact">
+    <div class="container">
+      <div class="reveal">
+        <div class="section__label" style="justify-content: center;">05 — Контакты</div>
+        <h2 class="contact__title">Давайте<br>создадим <em>что-то</em></h2>
+        <p class="contact__subtitle">
+          Открыт к предложениям о работе и интересным проектам.
+          Пишите — обсудим!
+        </p>
+
+        <div class="contact__links">
+          <a href="mailto:cerberuswardog@yandex.ru" class="contact-link">
+            <span class="contact-link__icon">✉️</span>
+            cerberuswardog@yandex.ru
+          </a>
+          <a href="https://t.me/faq_of_the_my_brain" target="_blank" class="contact-link">
+            <span class="contact-link__icon">💬</span>
+            @faq_of_the_my_brain
+          </a>
+          <a href="https://github.com/towel777" target="_blank" class="contact-link">
+            <span class="contact-link__icon">🔗</span>
+            GitHub
+          </a>
+          <a href="https://hh.ru/resume/6f60c444ff0fde0c140039ed1f6c3050576a6c" target="_blank" class="contact-link">
+            <span class="contact-link__icon">📋</span>
+            HH.ru
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer class="footer">
+    <div class="container">
+      <div class="footer__copy">© 2025 Никита Бургун</div>
+      <div class="footer__built">built with <span>Vue.js</span> & passion</div>
+    </div>
+  </footer>
+
+  <!-- SCRIPTS -->
+  <script>
+    // Scroll reveal animation
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach((entry, index) => {
+        if (entry.isIntersecting) {
+          // Stagger delay based on position within viewport batch
+          setTimeout(() => {
+            entry.target.classList.add('visible');
+          }, index * 80);
+          observer.unobserve(entry.target);
+        }
+      });
+    }, {
+      threshold: 0.15,
+      rootMargin: '0px 0px -60px 0px',
+    });
+
+    reveals.forEach((el) => observer.observe(el));
+
+    // Nav scroll effect
+    const nav = document.getElementById('nav');
+    let lastScroll = 0;
+
+    window.addEventListener('scroll', () => {
+      const scroll = window.scrollY;
+      if (scroll > 80) {
+        nav.classList.add('scrolled');
+      } else {
+        nav.classList.remove('scrolled');
+      }
+      lastScroll = scroll;
+    }, { passive: true });
+
+    // Smooth scroll for anchor links
+    document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+      anchor.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = document.querySelector(anchor.getAttribute('href'));
+        if (target) {
+          target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+      });
+    });
+  </script>
+</body>
+</html>
